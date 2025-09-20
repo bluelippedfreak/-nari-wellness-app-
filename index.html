@@ -1,0 +1,367 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Nari's Memory Demo</title>
+    <style>
+        body {
+            font-family: Arial, sans-serif;
+            text-align: center;
+            background: linear-gradient(135deg, #667eea 0%, #764ba2 100%);
+            min-height: 100vh;
+            margin: 0;
+            display: flex;
+            flex-direction: column;
+            justify-content: center;
+            align-items: center;
+        }
+
+        .container {
+            background: white;
+            padding: 30px;
+            border-radius: 20px;
+            box-shadow: 0 10px 30px rgba(0,0,0,0.2);
+            max-width: 450px;
+        }
+
+        .character-display {
+            width: 200px;
+            height: 200px;
+            margin: 20px auto;
+            border: 3px solid #ddd;
+            border-radius: 15px;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            font-size: 80px;
+            background: #f9f9f9;
+            transition: all 0.3s ease;
+        }
+
+        .mood-text {
+            font-size: 24px;
+            margin: 20px 0;
+            color: #333;
+        }
+
+        .mood-description {
+            font-size: 16px;
+            color: #666;
+            font-style: italic;
+            margin-bottom: 20px;
+        }
+
+        .stats-container {
+            background: #f5f5f5;
+            padding: 15px;
+            border-radius: 10px;
+            margin: 20px 0;
+            display: grid;
+            grid-template-columns: 1fr 1fr;
+            gap: 10px;
+            font-size: 14px;
+        }
+
+        .stat {
+            background: white;
+            padding: 8px;
+            border-radius: 5px;
+            font-weight: bold;
+        }
+
+        .button-container {
+            display: flex;
+            flex-wrap: wrap;
+            gap: 10px;
+            justify-content: center;
+        }
+
+        button {
+            padding: 12px 20px;
+            font-size: 16px;
+            border: none;
+            border-radius: 25px;
+            cursor: pointer;
+            transition: all 0.2s ease;
+            font-weight: bold;
+        }
+
+        .exercise-btn {
+            background: #4CAF50;
+            color: white;
+        }
+
+        .exercise-btn:hover {
+            background: #45a049;
+            transform: translateY(-2px);
+        }
+
+        .food-btn {
+            background: #FF9800;
+            color: white;
+        }
+
+        .food-btn:hover {
+            background: #e68900;
+            transform: translateY(-2px);
+        }
+
+        .water-btn {
+            background: #2196F3;
+            color: white;
+        }
+
+        .water-btn:hover {
+            background: #1976D2;
+            transform: translateY(-2px);
+        }
+
+        .hygiene-btn {
+            background: #9C27B0;
+            color: white;
+        }
+
+        .hygiene-btn:hover {
+            background: #7B1FA2;
+            transform: translateY(-2px);
+        }
+
+        .reset-btn {
+            background: #f44336;
+            color: white;
+            margin-top: 10px;
+        }
+
+        .reset-btn:hover {
+            background: #d32f2f;
+            transform: translateY(-2px);
+        }
+
+        .happy {
+            background: #e8f5e8 !important;
+            border-color: #4CAF50 !important;
+        }
+
+        .caring {
+            background: #fff3e0 !important;
+            border-color: #FF9800 !important;
+        }
+
+        .energized {
+            background: #e3f2fd !important;
+            border-color: #2196F3 !important;
+        }
+
+        .sad {
+            background: #fafafa !important;
+            border-color: #757575 !important;
+        }
+
+        .streak-highlight {
+            color: #4CAF50;
+            font-weight: bold;
+        }
+    </style>
+</head>
+<body>
+    <div class="container">
+        <h1>Nari's Memory Tracker</h1>
+        
+        <div class="character-display" id="nariDisplay">
+            😐
+        </div>
+        
+        <div class="mood-text" id="moodText">Nari is chilling...</div>
+        <div class="mood-description" id="moodDescription">"Whatever, I'm fine either way... I guess."</div>
+        
+        <div class="stats-container">
+            <div class="stat">Total Points: <span id="totalPoints">0</span></div>
+            <div class="stat">Exercise Streak: <span id="exerciseStreak">0</span></div>
+            <div class="stat">Hygiene Streak: <span id="hygieneStreak">0</span></div>
+            <div class="stat">Last Visit: <span id="lastVisit">Never</span></div>
+        </div>
+        
+        <div class="button-container">
+            <button class="exercise-btn" onclick="exerciseQuest()">Exercise Quest (+2 pts)</button>
+            <button class="food-btn" onclick="eatHealthy()">Eat Healthy (+1 pt)</button>
+            <button class="water-btn" onclick="drinkWater()">Drink Water (+1 pt)</button>
+            <button class="hygiene-btn" onclick="brushTeeth()">Brush Teeth (+1 pt)</button>
+            <button class="hygiene-btn" onclick="washFace()">Wash Face (+1 pt)</button>
+            <button class="hygiene-btn" onclick="floss()">Floss (+2 pts)</button>
+            <button class="reset-btn" onclick="resetProgress()">Reset All Data</button>
+        </div>
+    </div>
+
+    <script>
+        // This is the memory system! 
+        // When you reload the page, everything gets restored
+
+        // Load saved data when page loads
+        window.onload = function() {
+            loadNariData();
+            updateDisplay();
+        };
+
+        // Get data from memory (or set defaults if nothing saved)
+        function loadNariData() {
+            // Get data from localStorage, or use defaults if nothing exists
+            const savedData = JSON.parse(localStorage.getItem('nariData')) || {
+                mood: 'neutral',
+                totalPoints: 0,
+                exerciseStreak: 0,
+                hygieneStreak: 0,
+                lastVisit: 'Never',
+                todaysActivities: []
+            };
+
+            // Store in global variables so we can use them anywhere
+            window.nariData = savedData;
+            
+            // Update last visit to now
+            window.nariData.lastVisit = new Date().toLocaleString();
+            saveNariData();
+        }
+
+        // Save data to memory
+        function saveNariData() {
+            localStorage.setItem('nariData', JSON.stringify(window.nariData));
+        }
+
+        // Update all the displays with current data
+        function updateDisplay() {
+            document.getElementById('totalPoints').innerText = window.nariData.totalPoints;
+            document.getElementById('exerciseStreak').innerText = window.nariData.exerciseStreak;
+            document.getElementById('hygieneStreak').innerText = window.nariData.hygieneStreak;
+            document.getElementById('lastVisit').innerText = window.nariData.lastVisit;
+
+            // Show special messages for streaks
+            if (window.nariData.exerciseStreak >= 3) {
+                document.getElementById('exerciseStreak').classList.add('streak-highlight');
+            }
+            if (window.nariData.hygieneStreak >= 5) {
+                document.getElementById('hygieneStreak').classList.add('streak-highlight');
+            }
+        }
+
+        // Add points and update streaks
+        function addPoints(amount, activity) {
+            window.nariData.totalPoints += amount;
+            
+            // Track what we did today (could be used for more complex logic later)
+            if (!window.nariData.todaysActivities.includes(activity)) {
+                window.nariData.todaysActivities.push(activity);
+            }
+
+            // Update streaks based on activity type
+            if (activity === 'exercise') {
+                window.nariData.exerciseStreak += 1;
+            } else if (activity.includes('hygiene')) {
+                window.nariData.hygieneStreak += 1;
+            }
+
+            saveNariData();
+            updateDisplay();
+        }
+
+        // All the activity functions now save their data!
+        function exerciseQuest() {
+            const display = document.getElementById('nariDisplay');
+            const moodText = document.getElementById('moodText');
+            const description = document.getElementById('moodDescription');
+            
+            display.innerHTML = '😊';
+            display.className = 'character-display happy';
+            
+            moodText.innerHTML = 'Nari feels energized!';
+            description.innerHTML = '"Oh, that was... actually pretty nice. Good job, I guess."';
+            
+            window.nariData.mood = 'happy';
+            addPoints(2, 'exercise');
+        }
+
+        function eatHealthy() {
+            const display = document.getElementById('nariDisplay');
+            const moodText = document.getElementById('moodText');
+            const description = document.getElementById('moodDescription');
+            
+            display.innerHTML = '🌱';
+            display.className = 'character-display caring';
+            
+            moodText.innerHTML = 'Nari is tending his plants!';
+            description.innerHTML = '"See? Taking care of yourself helps me take care of my plants too."';
+            
+            window.nariData.mood = 'caring';
+            addPoints(1, 'food');
+        }
+
+        function drinkWater() {
+            const display = document.getElementById('nariDisplay');
+            const moodText = document.getElementById('moodText');
+            const description = document.getElementById('moodDescription');
+            
+            display.innerHTML = '💧';
+            display.className = 'character-display energized';
+            
+            moodText.innerHTML = 'Nari is refreshed!';
+            description.innerHTML = '"Hydration is pretty important... for both of us."';
+            
+            window.nariData.mood = 'energized';
+            addPoints(1, 'water');
+        }
+
+        function brushTeeth() {
+            const display = document.getElementById('nariDisplay');
+            const moodText = document.getElementById('moodText');
+            const description = document.getElementById('moodDescription');
+            
+            display.innerHTML = '🪥';
+            display.className = 'character-display happy';
+            
+            moodText.innerHTML = 'Nari approves of good hygiene!';
+            description.innerHTML = '"Clean teeth are important... Fenrir agrees, right buddy?"';
+            
+            window.nariData.mood = 'happy';
+            addPoints(1, 'hygiene-teeth');
+        }
+
+        function washFace() {
+            const display = document.getElementById('nariDisplay');
+            const moodText = document.getElementById('moodText');
+            const description = document.getElementById('moodDescription');
+            
+            display.innerHTML = '✨';
+            display.className = 'character-display caring';
+            
+            moodText.innerHTML = 'Nari feels fresh and clean!';
+            description.innerHTML = '"A clean face is a happy face... or whatever. You look good."';
+            
+            window.nariData.mood = 'caring';
+            addPoints(1, 'hygiene-face');
+        }
+
+        function floss() {
+            const display = document.getElementById('nariDisplay');
+            const moodText = document.getElementById('moodText');
+            const description = document.getElementById('moodDescription');
+            
+            display.innerHTML = '🦷';
+            display.className = 'character-display happy';
+            
+            moodText.innerHTML = 'Nari appreciates the dedication!';
+            description.innerHTML = '"Flossing? Wow, you\'re really going all out. I respect that."';
+            
+            window.nariData.mood = 'happy';
+            addPoints(2, 'hygiene-floss');
+        }
+
+        // Reset everything (for testing purposes)
+        function resetProgress() {
+            if (confirm("Are you sure you want to reset all of Nari's memories? He'll be sad to forget your progress!")) {
+                localStorage.removeItem('nariData');
+                location.reload(); // Refresh the page
+            }
+        }
+    </script>
+</body>
+</html>
