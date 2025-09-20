@@ -184,7 +184,7 @@
         
         <div class="button-container">
             <button class="exercise-btn" onclick="exerciseQuest()">Exercise Quest (+2 pts)</button>
-            <button class="food-btn" onclick="eatHealthy()">Eat Fruit (+1 pt)</button>
+            <button class="food-btn" onclick="eatFruit()">Eat Fruit (+1 pt)</button>
             <button class="water-btn" onclick="drinkWater()">Drink Water (+1 pt)</button>
             <button class="hygiene-btn" onclick="brushTeeth()">Brush Teeth (+1 pt)</button>
             <button class="hygiene-btn" onclick="washFace()">Wash Face (+1 pt)</button>
@@ -280,7 +280,7 @@
             addPoints(2, 'exercise');
         }
 
-        function eatHealthy() {
+        function eatFruit() {
             const display = document.getElementById('nariDisplay');
             const moodText = document.getElementById('moodText');
             const description = document.getElementById('moodDescription');
