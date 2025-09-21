@@ -200,6 +200,20 @@
         // Load saved data when page loads
         window.onload = function() {
             loadNariData();
+            
+    function eatHealthy() {
+        const display = document.getElementById('nariDisplay');
+        const moodText = document.getElementById('moodText');
+        const description = document.getElementById('moodDescription');
+        
+        display.innerHTML = '🍎';
+        display.className = 'character-display caring';
+        
+        moodText.innerHTML = 'Nari loves that you ate fruit!';
+        description.innerHTML = '"Fruit is pretty great... good choice."';
+        
+        window.nariData.mood = 'caring';
+        addPoints(1, 'food');
             updateDisplay();
         };
 
