@@ -279,21 +279,20 @@
             addPoints(2, 'exercise');
         }
 
-         function eatHealthy() {
-        const display = document.getElementById('nariDisplay');
-        const moodText = document.getElementById('moodText');
-        const description = document.getElementById('moodDescription');
-        
-        display.innerHTML = '🍎';
-        display.className = 'character-display caring';
-        
-        moodText.innerHTML = 'Nari loves that you ate fruit!';
-        description.innerHTML = '"Fruit is pretty great... good choice."';
-        
-        window.nariData.mood = 'caring';
-        addPoints(1, 'food');
-            updateDisplay();
-        }
+function eatHealthy() {
+    const display = document.getElementById('nariDisplay');
+    const moodText = document.getElementById('moodText');
+    const description = document.getElementById('moodDescription');
+    
+    display.innerHTML = '🍎';
+    display.className = 'character-display caring';
+    
+    moodText.innerHTML = 'Nari loves that you ate fruit!';
+    description.innerHTML = '"Fruit is pretty great... good choice."';
+    
+    window.nariData.mood = 'caring';
+    addPoints(1, 'food');
+}
 
         function drinkWater() {
             const display = document.getElementById('nariDisplay');
